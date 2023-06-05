@@ -8,30 +8,37 @@ class Hangman
   end
 
   def new_game
-    word = generate_word
-    @word_array = word.chars
+    @word = generate_word
+    @word_array = @word.chars
     @guess_array = Array.new(@word_array.length) { '_' }
-    puts "#{word} #{@word_array.length} #{@guess_array}"
+    # puts "#{@word} #{@word_array.length} #{@guess_array}"
   end
 
   def saver; end
 
   def generate_word
-    word = ''
+    @word = ''
     loop do
-      word = File.new('word_list.txt').readlines[Random.new.rand(0..10_000)].to_s.chomp
-      next unless word.length.between?(5, 12)
+      @word = File.new('word_list.txt').readlines[Random.new.rand(0..10_000)].to_s.chomp
+      next unless @word.length.between?(5, 12)
 
       break
     end
-    word
+    @word
   end
 
   def play_round
+    i = @word.length
     loop do
       CLI::UI::Prompt.ask('Play or Save?') do |handler|
         handler.option('Play') { guess }
         handler.option('Save') { saver }
+      end
+      i -= 1
+      puts "You have #{i} more guess(es)"
+      if i.zero?
+        puts 'Out of guesses!'
+        exit
       end
       exit if victory_check
     end
