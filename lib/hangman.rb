@@ -2,16 +2,19 @@
 
 require 'cli/ui'
 require 'fileutils'
+require 'json'
 
 class Hangman
   def loader
     puts 'Loading...'
-    old_savefile = File.open('savefile.txt', 'r')
-    @word = old_savefile.read
-    @word_array = old_savefile.read
-    @guess_array = old_savefile.read
-    @prev_guesses = old_savefile.read
-    old_savefile.close
+    old_savefile = File.open('savefile.json', 'r')
+    data = JSON.load old_savefile
+    puts data
+    puts data.class
+    @word = data['word']
+    @guess_array = data['guess_array']
+    @prev_guesses = data['prev_guesses']
+    @word_array = @word.chars
   end
 
   def new_game
@@ -24,14 +27,14 @@ class Hangman
 
   def saver
     puts 'Saving...'
-    FileUtils.rm_f('savefile.txt')
-    savefile = File.open('savefile.txt', 'w')
-    savefile.puts @word
-    savefile.puts @word_array
-    savefile.puts @guess_array
-    savefile.puts @prev_guesses
-
-    savefile.close
+    FileUtils.rm_f('savefile.json')
+    savefile = JSON.dump({
+      :word => @word,
+      :guess_array => @guess_array,
+      :prev_guesses => @prev_guesses,
+      :guesses_left => @i
+    })
+    File.open('savefile.json', 'w').puts savefile
     exit
   end
 
@@ -47,15 +50,15 @@ class Hangman
   end
 
   def play_round
-    i = @word.length
+    @i = @word.length
     loop do
       CLI::UI::Prompt.ask('Play or Save?') do |handler|
         handler.option('Play') { guess }
         handler.option('Save') { saver }
       end
-      i -= 1
-      puts "You have #{i} more guess(es)"
-      if i.zero?
+      @i -= 1
+      puts "You have #{@i} more guess(es)"
+      if @i.zero?
         puts 'Out of guesses!'
         exit
       end
@@ -94,7 +97,7 @@ class Hangman
     CLI::UI::Prompt.ask('New Game or Load Game?') do |handler|
       handler.option('New Game')  { new_game }
       handler.option('Load Game') do
-        if File.exist?('savefile.txt')
+        if File.exist?('savefile.json')
           loader
         else
           puts 'Save file does not exist!'
