@@ -9,9 +9,9 @@ class Hangman
 
   def new_game
     word = generate_word
-    word_array = word.chars
-    @guess_array = Array.new(word_array.length) { '_' }
-    puts "#{word} #{word_array.length} #{@guess_array}"
+    @word_array = word.chars
+    @guess_array = Array.new(@word_array.length) { '_' }
+    puts "#{word} #{@word_array.length} #{@guess_array}"
   end
 
   def saver; end
@@ -40,18 +40,19 @@ class Hangman
   def guess
     puts @guess_array.join(' ')
     loop do
-      guess_attempt = CLI::UI.ask('Guess a letter!').downcase
-      next unless guess_attempt.match?(/[a-z]/)
+      @guess_attempt = CLI::UI.ask('Guess a letter!').downcase
+      next unless @guess_attempt.match?(/[a-z]/)
 
-      return
+      break
     end
-    guess_attempt
+    guess_checker
   end
 
-  def guess_attempt
-    match_array = word_array.select { |letter| letter == guess_attempt }
+  def guess_checker
+    match_array = @word_array.each_index.select { |index| @word_array[index] == @guess_attempt }
+    puts "#{match_array} guessing: #{@guess_attempt}"
     match_array.each do |index|
-      @guess_array[index] = guess_attempt
+      @guess_array[index.to_i] = @guess_attempt
     end
   end
 
