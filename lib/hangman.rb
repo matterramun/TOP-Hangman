@@ -11,6 +11,7 @@ class Hangman
     @word = generate_word
     @word_array = @word.chars
     @guess_array = Array.new(@word_array.length) { '_' }
+    @prev_guesses = []
     # puts "#{@word} #{@word_array.length} #{@guess_array}"
   end
 
@@ -46,12 +47,14 @@ class Hangman
 
   def guess
     puts @guess_array.join(' ')
+    puts "Previous guesses... #{@prev_guesses.join(', ')}"
     loop do
       @guess_attempt = CLI::UI.ask('Guess a letter!').downcase
       next unless @guess_attempt.match?(/[a-z]/)
 
       break
     end
+    @prev_guesses << @guess_attempt
     guess_checker
   end
 
