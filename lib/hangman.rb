@@ -5,6 +5,12 @@ require 'cli/ui'
 class Hangman
   def loader
     puts 'Loading...'
+    old_savefile = File.open('savefile.txt', 'r')
+    @word = old_savefile.read
+    @word_array = old_savefile.read
+    @guess_array = old_savefile.read
+    @prev_guesses = old_savefile.read
+    old_savefile.close
   end
 
   def new_game
@@ -15,7 +21,18 @@ class Hangman
     # puts "#{@word} #{@word_array.length} #{@guess_array}"
   end
 
-  def saver; end
+  def saver
+    puts 'Saving...'
+    FileUtils.rm_f('savefile.txt')
+    savefile = File.open('savefile.txt', 'w')
+    savefile.puts @word
+    savefile.puts @word_array
+    savefile.puts @guess_array
+    savefile.puts @prev_guesses
+
+    savefile.close
+    exit
+  end
 
   def generate_word
     @word = ''
