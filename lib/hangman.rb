@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'cli/ui'
+require 'fileutils'
 
 class Hangman
   def loader
